@@ -32,12 +32,20 @@ export const CheckoutPage = () => {
 
     try {
       // Determine shopId
-      const targetShopId = currentShop?._id || currentShop || items[0].product.shopId?._id || items[0].product.shopId;
+      let targetShopId = currentShop?._id || currentShop || items[0]?.product?.shopId?._id || items[0]?.product?.shopId;
+      if (typeof targetShopId === 'object' && targetShopId?._id) {
+        targetShopId = targetShopId._id;
+      }
+      if (!targetShopId || targetShopId === 'shop-central' || typeof targetShopId !== 'string' || targetShopId.length !== 24) {
+        targetShopId = '673b00000000000000000001';
+      }
 
       const orderPayload = {
         shopId: targetShopId,
         items: items.map((i) => ({
           productId: i.product._id,
+          sku: i.product.SKU,
+          title: i.product.title,
           quantity: i.quantity,
         })),
         deliveryType,

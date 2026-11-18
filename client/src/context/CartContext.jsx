@@ -5,8 +5,31 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [items, setItems] = useState(() => {
-    const saved = localStorage.getItem('campuscart_items');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('campuscart_items');
+      if (!saved) return [];
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed)
+        ? parsed.map((item) => {
+            if (item?.product?.shopId === 'shop-central' || item?.product?.shopId?._id === 'shop-central') {
+              return {
+                ...item,
+                product: {
+                  ...item.product,
+                  shopId: {
+                    _id: '673b00000000000000000001',
+                    name: 'Campus Central Stationary',
+                    campusLocation: 'Student Activity Center, GF-04',
+                  },
+                },
+              };
+            }
+            return item;
+          })
+        : [];
+    } catch {
+      return [];
+    }
   });
   const [deliveryType, setDeliveryType] = useState('HOSTEL_DELIVERY');
 
