@@ -1,4 +1,12 @@
-import 'dotenv/config';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config(); // fallback
+
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { connectDB } from '../config/db.js';
@@ -29,7 +37,7 @@ const seedDatabase = async () => {
     const passwordHash = await bcrypt.hash('Campus@123', 10);
 
     console.log('[Seed] Creating core accounts (Admin, Vendors, Student, Delivery)...');
-    const [admin, vendor1, vendor2, student1, deliveryAgent] = await User.create([
+    const [admin, vendor1, vendor2, student1, sachinStudent, deliveryAgent] = await User.create([
       {
         name: 'Dr. Sarah Jenkins (Admin)',
         email: 'admin@campuscart.edu',
@@ -69,6 +77,26 @@ const seedDatabase = async () => {
             hostelBlock: 'Hostel Block C',
             roomNumber: '312',
             campusLandmark: 'Opposite Basketball Court',
+            isDefault: true,
+          },
+        ],
+      },
+      {
+        name: 'Sachin Kumar Sah',
+        email: 'shibukumar3935@gmail.com',
+        phone: '+91 98765 43210',
+        passwordHash,
+        role: 'STUDENT',
+        collegeId: 'STU-2024-CSE01',
+        hostelBlock: 'Hostel Block C',
+        roomNumber: '312',
+        isEmailVerified: true,
+        addresses: [
+          {
+            label: 'Hostel Room',
+            hostelBlock: 'Hostel Block C',
+            roomNumber: '312',
+            campusLandmark: 'Near Common Room Entrance',
             isDefault: true,
           },
         ],
