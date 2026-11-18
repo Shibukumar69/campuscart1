@@ -70,7 +70,7 @@ export const VendorDashboard = () => {
             Real-time inventory health, ML-based demand predictions, and campus delivery orders.
           </p>
         </div>
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap gap-2">
           <Link
             to="/vendor/forecasting"
             className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs flex items-center space-x-1.5 transition"

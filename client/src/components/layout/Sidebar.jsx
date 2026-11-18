@@ -20,51 +20,54 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
+export const studentLinks = [
+  { to: '/student/dashboard', icon: LayoutDashboard, label: 'Student Home' },
+  { to: '/marketplace', icon: ShoppingBag, label: 'Browse Stationery' },
+  { to: '/printing', icon: Printer, label: 'Upload for Printing' },
+  { to: '/student/orders', icon: Package, label: 'My Orders & OTP' },
+  { to: '/student/print-jobs', icon: FileText, label: 'My Print Jobs' },
+];
+
+export const vendorLinks = [
+  { to: '/vendor/dashboard', icon: LayoutDashboard, label: 'Vendor Overview' },
+  { to: '/vendor/products', icon: Package, label: 'Products & Catalog' },
+  { to: '/vendor/inventory', icon: Boxes, label: 'Inventory & Stock' },
+  { to: '/vendor/ledger', icon: FileSpreadsheet, label: 'Inventory Ledger' },
+  { to: '/vendor/forecasting', icon: Brain, label: 'AI Demand Forecast' },
+  { to: '/vendor/reorder-advice', icon: TrendingUp, label: 'Reorder Advisor & POs' },
+  { to: '/vendor/orders', icon: ShoppingBag, label: 'Store Orders' },
+  { to: '/vendor/printing-queue', icon: Printer, label: 'Printing Queue' },
+];
+
+export const deliveryLinks = [
+  { to: '/delivery/dashboard', icon: LayoutDashboard, label: 'Delivery Center' },
+  { to: '/delivery/orders', icon: Truck, label: 'Assigned Deliveries' },
+];
+
+export const adminLinks = [
+  { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Platform Metrics' },
+  { to: '/admin/users', icon: Users, label: 'User Directory' },
+  { to: '/admin/approvals', icon: ShieldCheck, label: 'Vendor Approvals' },
+  { to: '/admin/calendar', icon: CalendarDays, label: 'Academic Calendar' },
+  { to: '/admin/audit-logs', icon: Clock, label: 'System Audit Logs' },
+];
+
+export const getRoleNavLinks = (role) => {
+  if (role === 'SHOP_OWNER') return vendorLinks;
+  if (role === 'DELIVERY_AGENT') return deliveryLinks;
+  if (role === 'ADMIN') return adminLinks;
+  return studentLinks;
+};
+
 export const Sidebar = () => {
   const { user } = useAuth();
   if (!user) return null;
 
   const role = user.role;
-
-  const studentLinks = [
-    { to: '/student/dashboard', icon: LayoutDashboard, label: 'Student Home' },
-    { to: '/marketplace', icon: ShoppingBag, label: 'Browse Stationery' },
-    { to: '/printing', icon: Printer, label: 'Upload for Printing' },
-    { to: '/student/orders', icon: Package, label: 'My Orders & OTP' },
-    { to: '/student/print-jobs', icon: FileText, label: 'My Print Jobs' },
-  ];
-
-  const vendorLinks = [
-    { to: '/vendor/dashboard', icon: LayoutDashboard, label: 'Vendor Overview' },
-    { to: '/vendor/products', icon: Package, label: 'Products & Catalog' },
-    { to: '/vendor/inventory', icon: Boxes, label: 'Inventory & Stock' },
-    { to: '/vendor/ledger', icon: FileSpreadsheet, label: 'Inventory Ledger' },
-    { to: '/vendor/forecasting', icon: Brain, label: 'AI Demand Forecast' },
-    { to: '/vendor/reorder-advice', icon: TrendingUp, label: 'Reorder Advisor & POs' },
-    { to: '/vendor/orders', icon: ShoppingBag, label: 'Store Orders' },
-    { to: '/vendor/printing-queue', icon: Printer, label: 'Printing Queue' },
-  ];
-
-  const deliveryLinks = [
-    { to: '/delivery/dashboard', icon: LayoutDashboard, label: 'Delivery Center' },
-    { to: '/delivery/orders', icon: Truck, label: 'Assigned Deliveries' },
-  ];
-
-  const adminLinks = [
-    { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Platform Metrics' },
-    { to: '/admin/users', icon: Users, label: 'User Directory' },
-    { to: '/admin/approvals', icon: ShieldCheck, label: 'Vendor Approvals' },
-    { to: '/admin/calendar', icon: CalendarDays, label: 'Academic Calendar' },
-    { to: '/admin/audit-logs', icon: Clock, label: 'System Audit Logs' },
-  ];
-
-  let links = studentLinks;
-  if (role === 'SHOP_OWNER') links = vendorLinks;
-  if (role === 'DELIVERY_AGENT') links = deliveryLinks;
-  if (role === 'ADMIN') links = adminLinks;
+  const links = getRoleNavLinks(role);
 
   return (
-    <aside className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0 min-h-[calc(100vh-4rem)]">
+    <aside className="hidden lg:flex w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex-col shrink-0 min-h-[calc(100vh-4rem)]">
       {/* Role banner */}
       <div className="p-4 border-b border-slate-100 dark:border-slate-800">
         <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Active Workspace</p>
