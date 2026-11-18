@@ -86,6 +86,13 @@ const productSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    semester: {
+      type: Number,
+      min: 1,
+      max: 8,
+      default: null,
+      index: true,
+    },
   },
   {
     timestamps: true,

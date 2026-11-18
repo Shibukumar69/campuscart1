@@ -17,6 +17,7 @@ export const getProducts = async (req, res, next) => {
     const {
       search,
       category,
+      semester,
       shopId,
       minPrice,
       maxPrice,
@@ -29,6 +30,10 @@ export const getProducts = async (req, res, next) => {
     } = req.query;
 
     const query = { isActive: true };
+
+    if (semester) {
+      query.semester = Number(semester);
+    }
 
     if (shopId) {
       query.shopId = shopId;

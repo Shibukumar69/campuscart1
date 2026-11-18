@@ -10,12 +10,11 @@ import { Order } from '../models/Order.js';
 import { PrintJob } from '../models/PrintJob.js';
 import { AcademicCalendar } from '../models/AcademicCalendar.js';
 import { InventoryLedger } from '../models/InventoryLedger.js';
-import { generateDeliveryOtp } from '../utils/tokens.js';
 
 const seedDatabase = async () => {
   try {
     await connectDB();
-    console.log('[Seed] Purging existing database collections for fresh seed...');
+    console.log('[Seed] Purging all collections for a fresh, clean database...');
     await Promise.all([
       User.deleteMany({}),
       Shop.deleteMany({}),
@@ -29,8 +28,8 @@ const seedDatabase = async () => {
 
     const passwordHash = await bcrypt.hash('Campus@123', 10);
 
-    console.log('[Seed] Creating demo users...');
-    const [admin, vendor1, vendor2, student1, student2, deliveryAgent] = await User.create([
+    console.log('[Seed] Creating core accounts (Admin, Vendors, Student, Delivery)...');
+    const [admin, vendor1, vendor2, student1, deliveryAgent] = await User.create([
       {
         name: 'Dr. Sarah Jenkins (Admin)',
         email: 'admin@campuscart.edu',
@@ -40,7 +39,7 @@ const seedDatabase = async () => {
         collegeId: 'FAC-2024-001',
       },
       {
-        name: 'Rajesh Kumar (Shop Owner)',
+        name: 'Rajesh Kumar (Stationery & Lab Hub)',
         email: 'vendor@campuscart.edu',
         phone: '+91 98765 00002',
         passwordHash,
@@ -48,7 +47,7 @@ const seedDatabase = async () => {
         collegeId: 'VEN-2024-010',
       },
       {
-        name: 'Anita Sharma (Print Hub Owner)',
+        name: 'Anita Sharma (QuickPrint & Tech Xerox)',
         email: 'printvendor@campuscart.edu',
         phone: '+91 98765 00003',
         passwordHash,
@@ -75,25 +74,6 @@ const seedDatabase = async () => {
         ],
       },
       {
-        name: 'Priya Verma (Student)',
-        email: 'priya@campuscart.edu',
-        phone: '+91 98765 00005',
-        passwordHash,
-        role: 'STUDENT',
-        collegeId: 'STU-2023-EC208',
-        hostelBlock: 'Girls Hostel 2',
-        roomNumber: '105',
-        addresses: [
-          {
-            label: 'Hostel Room',
-            hostelBlock: 'Girls Hostel 2',
-            roomNumber: '105',
-            campusLandmark: 'Near East Lawn',
-            isDefault: true,
-          },
-        ],
-      },
-      {
         name: 'Vikram Singh (Campus Delivery)',
         email: 'delivery@campuscart.edu',
         phone: '+91 98765 00006',
@@ -103,12 +83,12 @@ const seedDatabase = async () => {
       },
     ]);
 
-    console.log('[Seed] Creating campus shops...');
+    console.log('[Seed] Creating authorized campus shops...');
     const [shop1, shop2] = await Shop.create([
       {
-        name: 'Central Campus Stationery Hub',
+        name: 'Central Campus Stationery & Lab Hub',
         ownerId: vendor1._id,
-        description: 'Authorized retailer for college notebooks, pens, practical record sheets, and calculators.',
+        description: 'Official supplier for Semester 1 to 8 Engineering Lab Files, practical record sheets, instruments, and stationery.',
         campusLocation: 'Student Activity Center, Ground Floor, Stall #1',
         supportedDeliveryAreas: ['Hostel Block A', 'Hostel Block B', 'Hostel Block C', 'Girls Hostel 1', 'Girls Hostel 2'],
         rating: 4.9,
@@ -119,9 +99,9 @@ const seedDatabase = async () => {
         offersPrinting: true,
       },
       {
-        name: 'QuickPrint & Tech Xerox',
+        name: 'QuickPrint & Tech Xerox Hub',
         ownerId: vendor2._id,
-        description: 'High-speed color and monochrome laser printing, spiral binding, and engineering stationery.',
+        description: 'High-speed color and monochrome laser printing, spiral binding, and project report hardbinding.',
         campusLocation: 'Library Arcade, Opposite Admin Block',
         supportedDeliveryAreas: ['Hostel Block A', 'Hostel Block B', 'Hostel Block C', 'Girls Hostel 1', 'Girls Hostel 2', 'Library'],
         rating: 4.8,
@@ -133,21 +113,460 @@ const seedDatabase = async () => {
       },
     ]);
 
-    console.log('[Seed] Creating categories...');
+    console.log('[Seed] Creating stationery categories including Semester Lab Files...');
     const categories = await Category.create([
-      { name: 'Notebooks & Registers', slug: 'notebooks', description: 'Ruled, unruled, spiral and lab registers', iconName: 'Book' },
-      { name: 'Pens & Writing', slug: 'pens', description: 'Ballpoint, gel, ink pens, markers and highlighters', iconName: 'Edit3' },
-      { name: 'Practical & Lab Supplies', slug: 'lab-supplies', description: 'Graph sheets, practical files, tracing paper', iconName: 'FileText' },
-      { name: 'Calculators & Electronics', slug: 'calculators', description: 'Scientific calculators and accessories', iconName: 'Cpu' },
-      { name: 'Art & Geometry', slug: 'art-geometry', description: 'Geometry boxes, drafters, sketch pens, chart paper', iconName: 'Compass' },
-      { name: 'Files & Folders', slug: 'files-folders', description: 'Ring binders, clear folders, document organizers', iconName: 'Folder' },
+      {
+        name: 'Semester Lab Files & Records',
+        slug: 'lab-files',
+        description: 'Official university practical lab files & manuals organized semester-wise from Semester 1 to Semester 8',
+        iconName: 'FileCheck',
+      },
+      {
+        name: 'Practical & Lab Accessories',
+        slug: 'lab-accessories',
+        description: 'Punch-hole assignment sheets, millimeter graph paper, transparent clip folders & sleeves',
+        iconName: 'Folder',
+      },
+      {
+        name: 'Notebooks & Registers',
+        slug: 'notebooks',
+        description: 'Single line ruled, spiral notebooks, hardbound registers for lecture notes',
+        iconName: 'Book',
+      },
+      {
+        name: 'Pens & Writing Essentials',
+        slug: 'pens',
+        description: 'Waterproof gel pens, rollerballs, permanent markers and pastel highlighters',
+        iconName: 'Edit3',
+      },
+      {
+        name: 'Calculators & Electronics',
+        slug: 'calculators',
+        description: 'University exam approved non-programmable scientific calculators',
+        iconName: 'Cpu',
+      },
+      {
+        name: 'Art & Engineering Geometry',
+        slug: 'art-geometry',
+        description: 'Mini drafters, geometry boxes, compass sets, and drafting tools',
+        iconName: 'Compass',
+      },
     ]);
 
     const catMap = {};
     categories.forEach((c) => (catMap[c.slug] = c._id));
 
-    console.log('[Seed] Creating catalog products with realistic inventory parameters...');
+    console.log('[Seed] Adding Semester 1 to 8 Lab Files & Essential Campus Stationery...');
     const productsData = [
+      // ================= SEMESTER 1 =================
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-files'],
+        semester: 1,
+        title: 'Semester 1: Basic Physics & Chemistry Lab Record File (120 Pages)',
+        slug: 'sem1-physics-chemistry-lab-record',
+        description: 'Standard 1st Year Engineering practical record book. One side ruled and one side blank graph paper. Includes official index, rubric, and certificate pages.',
+        SKU: 'LAB-SEM1-PHYCHEM',
+        price: 75,
+        costPrice: 45,
+        currentStock: 80,
+        minStockThreshold: 20,
+        leadTimeDays: 2,
+        safetyStock: 15,
+        images: ['https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=600&auto=format&fit=crop&q=80'],
+        tags: ['semester-1', 'lab-file', 'physics', 'chemistry', 'first-year', 'bestseller'],
+        isFeatured: true,
+      },
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-files'],
+        semester: 1,
+        title: 'Semester 1: Engineering Graphics & CAD Drawing Sheet Binder',
+        slug: 'sem1-engineering-graphics-drawing-binder',
+        description: 'Landscape heavy-duty clamp binder designed specifically for A3/A4 engineering drawing plates and CAD printouts.',
+        SKU: 'LAB-SEM1-EGD',
+        price: 95,
+        costPrice: 60,
+        currentStock: 50,
+        minStockThreshold: 15,
+        leadTimeDays: 2,
+        safetyStock: 10,
+        images: ['https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=600&auto=format&fit=crop&q=80'],
+        tags: ['semester-1', 'lab-file', 'engineering-graphics', 'drawing'],
+        isFeatured: true,
+      },
+
+      // ================= SEMESTER 2 =================
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-files'],
+        semester: 2,
+        title: 'Semester 2: C Programming & Problem Solving Practical File (100 Pages)',
+        slug: 'sem2-c-programming-lab-file',
+        description: 'Interleaved computer laboratory file with dedicated syntax blocks, flowchart margins, and terminal output verification sheets.',
+        SKU: 'LAB-SEM2-CPRG',
+        price: 70,
+        costPrice: 42,
+        currentStock: 75,
+        minStockThreshold: 20,
+        leadTimeDays: 2,
+        safetyStock: 15,
+        images: ['https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80'],
+        tags: ['semester-2', 'lab-file', 'c-programming', 'coding'],
+        isFeatured: true,
+      },
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-files'],
+        semester: 2,
+        title: 'Semester 2: Basic Electrical & Electronics Engineering (BEEE) Lab Record',
+        slug: 'sem2-beee-electrical-electronics-lab-record',
+        description: '120-page university approved practical record with circuit schematic grids and verification observation tables.',
+        SKU: 'LAB-SEM2-BEEE',
+        price: 80,
+        costPrice: 50,
+        currentStock: 60,
+        minStockThreshold: 15,
+        leadTimeDays: 2,
+        safetyStock: 12,
+        images: ['https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=600&auto=format&fit=crop&q=80'],
+        tags: ['semester-2', 'lab-file', 'electrical', 'electronics'],
+        isFeatured: false,
+      },
+
+      // ================= SEMESTER 3 =================
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-files'],
+        semester: 3,
+        title: 'Semester 3: Data Structures & Algorithms (DSA) Practical Record File',
+        slug: 'sem3-dsa-data-structures-lab-file',
+        description: '140-page high-GSM laboratory file tailored for algorithm implementations, time-complexity analysis tables, and binary tree diagrams.',
+        SKU: 'LAB-SEM3-DSA',
+        price: 85,
+        costPrice: 52,
+        currentStock: 70,
+        minStockThreshold: 20,
+        leadTimeDays: 2,
+        safetyStock: 15,
+        images: ['https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80'],
+        tags: ['semester-3', 'lab-file', 'dsa', 'data-structures', 'bestseller'],
+        isFeatured: true,
+      },
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-files'],
+        semester: 3,
+        title: 'Semester 3: Digital Electronics & Logic Design (DELD) Lab File',
+        slug: 'sem3-digital-electronics-logic-design-file',
+        description: 'Practical record book containing truth table templates, K-map grid folios, and IC pin-out reference sheets.',
+        SKU: 'LAB-SEM3-DELD',
+        price: 75,
+        costPrice: 45,
+        currentStock: 55,
+        minStockThreshold: 15,
+        leadTimeDays: 2,
+        safetyStock: 10,
+        images: ['https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=600&auto=format&fit=crop&q=80'],
+        tags: ['semester-3', 'lab-file', 'digital-electronics', 'logic-design'],
+        isFeatured: false,
+      },
+
+      // ================= SEMESTER 4 =================
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-files'],
+        semester: 4,
+        title: 'Semester 4: Database Management Systems (DBMS) & SQL Lab File',
+        slug: 'sem4-dbms-database-practical-file',
+        description: '120-page lab dossier with relational schema layout grids, ER modeling stencils, and tabular query output verification sections.',
+        SKU: 'LAB-SEM4-DBMS',
+        price: 85,
+        costPrice: 52,
+        currentStock: 65,
+        minStockThreshold: 15,
+        leadTimeDays: 2,
+        safetyStock: 12,
+        images: ['https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80'],
+        tags: ['semester-4', 'lab-file', 'dbms', 'sql', 'database'],
+        isFeatured: true,
+      },
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-files'],
+        semester: 4,
+        title: 'Semester 4: Object-Oriented Programming (Java / C++) Lab Record',
+        slug: 'sem4-java-oop-programming-lab-record',
+        description: '140-page lab record with UML class diagram stencils, inheritance hierarchy trees, and unit-testing worksheets.',
+        SKU: 'LAB-SEM4-JAVA',
+        price: 85,
+        costPrice: 52,
+        currentStock: 65,
+        minStockThreshold: 15,
+        leadTimeDays: 2,
+        safetyStock: 12,
+        images: ['https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=600&auto=format&fit=crop&q=80'],
+        tags: ['semester-4', 'lab-file', 'java', 'oop'],
+        isFeatured: false,
+      },
+
+      // ================= SEMESTER 5 =================
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-files'],
+        semester: 5,
+        title: 'Semester 5: Operating Systems & System Programming Lab File',
+        slug: 'sem5-operating-systems-lab-file',
+        description: 'Practical manual file with CPU scheduling Gantt chart templates, memory paging tables, and shell scripting layouts.',
+        SKU: 'LAB-SEM5-OS',
+        price: 85,
+        costPrice: 52,
+        currentStock: 60,
+        minStockThreshold: 15,
+        leadTimeDays: 2,
+        safetyStock: 12,
+        images: ['https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80'],
+        tags: ['semester-5', 'lab-file', 'operating-systems', 'linux'],
+        isFeatured: true,
+      },
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-files'],
+        semester: 5,
+        title: 'Semester 5: Computer Networks & Protocol Analysis Practical Record',
+        slug: 'sem5-computer-networks-lab-record',
+        description: '100-page laboratory file with Wireshark packet capture logs, IP subnetting worksheets, and network topology diagram sheets.',
+        SKU: 'LAB-SEM5-CN',
+        price: 80,
+        costPrice: 48,
+        currentStock: 55,
+        minStockThreshold: 15,
+        leadTimeDays: 2,
+        safetyStock: 10,
+        images: ['https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=600&auto=format&fit=crop&q=80'],
+        tags: ['semester-5', 'lab-file', 'computer-networks', 'networking'],
+        isFeatured: false,
+      },
+
+      // ================= SEMESTER 6 =================
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-files'],
+        semester: 6,
+        title: 'Semester 6: Full-Stack Web Development & Frameworks Lab File',
+        slug: 'sem6-web-technologies-lab-file',
+        description: '120-page practical record with UI component wireframes, REST API request/response documentation templates, and responsive checklists.',
+        SKU: 'LAB-SEM6-WEB',
+        price: 90,
+        costPrice: 55,
+        currentStock: 50,
+        minStockThreshold: 15,
+        leadTimeDays: 2,
+        safetyStock: 10,
+        images: ['https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80'],
+        tags: ['semester-6', 'lab-file', 'web-development', 'react', 'node'],
+        isFeatured: true,
+      },
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-files'],
+        semester: 6,
+        title: 'Semester 6: Software Engineering & Agile Project Design File',
+        slug: 'sem6-software-engineering-design-file',
+        description: 'Comprehensive design file including SRS specification templates, Use Case diagrams, and sprint burndown charts.',
+        SKU: 'LAB-SEM6-SE',
+        price: 80,
+        costPrice: 48,
+        currentStock: 45,
+        minStockThreshold: 12,
+        leadTimeDays: 2,
+        safetyStock: 10,
+        images: ['https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=600&auto=format&fit=crop&q=80'],
+        tags: ['semester-6', 'lab-file', 'software-engineering', 'agile'],
+        isFeatured: false,
+      },
+
+      // ================= SEMESTER 7 =================
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-files'],
+        semester: 7,
+        title: 'Semester 7: Artificial Intelligence & Machine Learning (AI/ML) Lab Manual',
+        slug: 'sem7-ai-ml-machine-learning-lab-record',
+        description: '140-page advanced laboratory dossier with model training loss curves, confusion matrices, and hyperparameter tables.',
+        SKU: 'LAB-SEM7-AIML',
+        price: 95,
+        costPrice: 58,
+        currentStock: 50,
+        minStockThreshold: 15,
+        leadTimeDays: 2,
+        safetyStock: 12,
+        images: ['https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80'],
+        tags: ['semester-7', 'lab-file', 'ai', 'machine-learning', 'python', 'bestseller'],
+        isFeatured: true,
+      },
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-files'],
+        semester: 7,
+        title: 'Semester 7: Cloud Computing & DevOps Practical Dossier',
+        slug: 'sem7-cloud-devops-practical-dossier',
+        description: '100-page cloud infrastructure record with Docker container worksheets and CI/CD pipeline flow diagram folios.',
+        SKU: 'LAB-SEM7-CLOUD',
+        price: 90,
+        costPrice: 55,
+        currentStock: 45,
+        minStockThreshold: 12,
+        leadTimeDays: 2,
+        safetyStock: 10,
+        images: ['https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=600&auto=format&fit=crop&q=80'],
+        tags: ['semester-7', 'lab-file', 'cloud', 'devops'],
+        isFeatured: false,
+      },
+
+      // ================= SEMESTER 8 =================
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-files'],
+        semester: 8,
+        title: 'Semester 8: Major Capstone Project Hardbound Dissertation Binder',
+        slug: 'sem8-major-project-hardbound-dissertation-binder',
+        description: 'University standard black hardbound binder with gold-embossed spine, certificate of originality page, guide approval leaf, and 200-page capacity.',
+        SKU: 'LAB-SEM8-PROJ',
+        price: 160,
+        costPrice: 105,
+        currentStock: 40,
+        minStockThreshold: 10,
+        leadTimeDays: 3,
+        safetyStock: 8,
+        images: ['https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=600&auto=format&fit=crop&q=80'],
+        tags: ['semester-8', 'lab-file', 'major-project', 'dissertation', 'final-year', 'bestseller'],
+        isFeatured: true,
+      },
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-files'],
+        semester: 8,
+        title: 'Semester 8: Final Year Technical Seminar & Comprehensive Viva Dossier',
+        slug: 'sem8-viva-voce-technical-seminar-dossier',
+        description: 'Clear-view presentation portfolio folder with archival sleeves for final year presentation slides, published papers, and faculty scorecards.',
+        SKU: 'LAB-SEM8-VIVA',
+        price: 110,
+        costPrice: 70,
+        currentStock: 45,
+        minStockThreshold: 10,
+        leadTimeDays: 2,
+        safetyStock: 10,
+        images: ['https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=600&auto=format&fit=crop&q=80'],
+        tags: ['semester-8', 'lab-file', 'viva', 'seminar', 'final-year'],
+        isFeatured: false,
+      },
+
+      // ================= LAB ACCESSORIES =================
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-accessories'],
+        title: 'Navneet University Practical Assignment Sheets (Pack of 100)',
+        slug: 'navneet-practical-assignment-sheets-100',
+        description: 'Heavy 75 GSM one-side ruled punch-hole sheets with standard margins and header line for lab experiments and assignments.',
+        SKU: 'LAB-ACC-SHT100',
+        price: 80,
+        costPrice: 50,
+        currentStock: 90,
+        minStockThreshold: 25,
+        leadTimeDays: 2,
+        safetyStock: 20,
+        images: ['https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=600&auto=format&fit=crop&q=80'],
+        tags: ['lab-accessories', 'sheets', 'assignment', 'bestseller'],
+        isFeatured: true,
+      },
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-accessories'],
+        title: 'A4 Millimeter Graph Sheets (Pack of 50 Sheets)',
+        slug: 'a4-millimeter-graph-sheets-pack-50',
+        description: 'Accurate 1mm green grid spacing on heavy paper for mathematics, physics, and electrical laboratory curves.',
+        SKU: 'LAB-ACC-GRP50',
+        price: 55,
+        costPrice: 32,
+        currentStock: 80,
+        minStockThreshold: 20,
+        leadTimeDays: 2,
+        safetyStock: 15,
+        images: ['https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80'],
+        tags: ['lab-accessories', 'graph-paper'],
+        isFeatured: false,
+      },
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-accessories'],
+        title: 'Solo 2-Ring Report Binder with 20 Clear Sleeves',
+        slug: 'solo-2-ring-report-binder-20-sleeves',
+        description: 'Durable polypropylene binder with 20 crystal-clear sleeves for certificates, report submissions, and lab assignments.',
+        SKU: 'LAB-ACC-RNG20',
+        price: 125,
+        costPrice: 80,
+        currentStock: 40,
+        minStockThreshold: 15,
+        leadTimeDays: 2,
+        safetyStock: 10,
+        images: ['https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=600&auto=format&fit=crop&q=80'],
+        tags: ['lab-accessories', 'folder', 'binder'],
+        isFeatured: false,
+      },
+      {
+        shopId: shop1._id,
+        categoryId: catMap['lab-accessories'],
+        title: 'Standard Strip & Prong Clip Lab File Folder (Pack of 5)',
+        slug: 'standard-strip-clip-lab-folder-pack-5',
+        description: 'Color-coded flexible report folders with slide binder mechanism for college lab experiment hand-ins.',
+        SKU: 'LAB-ACC-STP5',
+        price: 45,
+        costPrice: 25,
+        currentStock: 70,
+        minStockThreshold: 20,
+        leadTimeDays: 2,
+        safetyStock: 15,
+        images: ['https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=600&auto=format&fit=crop&q=80'],
+        tags: ['lab-accessories', 'strip-file', 'folder'],
+        isFeatured: false,
+      },
+
+      // ================= CAMPUS ESSENTIAL STATIONERY =================
+      {
+        shopId: shop1._id,
+        categoryId: catMap['calculators'],
+        title: 'Casio fx-991CW ClassWiz Scientific Calculator',
+        slug: 'casio-fx991cw-scientific-calculator',
+        description: 'Approved for college university examinations. 540 functions, high resolution 4-gradation display.',
+        SKU: 'CALC-CS-991CW',
+        price: 1595,
+        costPrice: 1250,
+        currentStock: 15,
+        minStockThreshold: 5,
+        leadTimeDays: 4,
+        safetyStock: 4,
+        images: ['https://images.unsplash.com/photo-1587145820266-a5951ee6f620?w=600&auto=format&fit=crop&q=80'],
+        tags: ['calculator', 'engineering', 'exam-essential', 'bestseller'],
+        isFeatured: true,
+      },
+      {
+        shopId: shop1._id,
+        categoryId: catMap['pens'],
+        title: 'Reynolds Trimax Liquid Gel Pen (Blue, Pack of 5)',
+        slug: 'reynolds-trimax-gel-blue-pack-5',
+        description: 'Max write length with waterproof ink, smudge-free 0.5mm needle tip for fast lab writing & exams.',
+        SKU: 'PEN-TMX-BL5',
+        price: 250,
+        costPrice: 180,
+        currentStock: 40,
+        minStockThreshold: 15,
+        leadTimeDays: 2,
+        safetyStock: 10,
+        images: ['https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=600&auto=format&fit=crop&q=80'],
+        tags: ['pens', 'bestseller', 'exam-essential'],
+        isFeatured: true,
+      },
       {
         shopId: shop1._id,
         categoryId: catMap['notebooks'],
@@ -157,81 +576,13 @@ const seedDatabase = async () => {
         SKU: 'NB-CLM-300',
         price: 95,
         costPrice: 65,
-        currentStock: 48,
+        currentStock: 60,
         minStockThreshold: 20,
         leadTimeDays: 2,
         safetyStock: 15,
         images: ['https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80'],
-        tags: ['bestseller', 'exam-essential', 'notebook'],
-        isFeatured: true,
-      },
-      {
-        shopId: shop1._id,
-        categoryId: catMap['notebooks'],
-        title: 'Hardbound Engineering Lab Record Book (180 Pages)',
-        slug: 'hardbound-engineering-lab-record-180',
-        description: 'Standard college format lab record book with one side blank graph/drawing and one side ruled.',
-        SKU: 'NB-LAB-180',
-        price: 80,
-        costPrice: 52,
-        currentStock: 18, // Approach low stock alert
-        minStockThreshold: 25,
-        leadTimeDays: 3,
-        safetyStock: 15,
-        images: ['https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=600&auto=format&fit=crop&q=80'],
-        tags: ['lab-record', 'exam-essential'],
-        isFeatured: true,
-      },
-      {
-        shopId: shop1._id,
-        categoryId: catMap['pens'],
-        title: 'Reynolds Trimax Liquid Gel Pen (Blue, Pack of 5)',
-        slug: 'reynolds-trimax-gel-blue-pack-5',
-        description: 'Max write length with waterproof ink, smudge-free 0.5mm needle tip for exams.',
-        SKU: 'PEN-TMX-BL5',
-        price: 250,
-        costPrice: 180,
-        currentStock: 35,
-        minStockThreshold: 15,
-        leadTimeDays: 2,
-        safetyStock: 10,
-        images: ['https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=600&auto=format&fit=crop&q=80'],
-        tags: ['bestseller', 'exam-essential'],
-        isFeatured: true,
-      },
-      {
-        shopId: shop1._id,
-        categoryId: catMap['pens'],
-        title: 'Pilot V5 Liquid Ink Rollerball Pen (Black)',
-        slug: 'pilot-v5-liquid-ink-rollerball-black',
-        description: 'Precision Japanese 0.5mm extra fine tip with pure liquid ink flow controller.',
-        SKU: 'PEN-PLT-BK',
-        price: 70,
-        costPrice: 48,
-        currentStock: 6, // Low stock critical
-        minStockThreshold: 15,
-        leadTimeDays: 2,
-        safetyStock: 10,
-        images: ['https://images.unsplash.com/photo-1585336261026-77cc7c358396?w=600&auto=format&fit=crop&q=80'],
-        tags: ['pens', 'premium'],
+        tags: ['notebook', 'essential'],
         isFeatured: false,
-      },
-      {
-        shopId: shop1._id,
-        categoryId: catMap['calculators'],
-        title: 'Casio fx-991CW ClassWiz Non-Programmable Scientific Calculator',
-        slug: 'casio-fx991cw-scientific-calculator',
-        description: 'Approved for college university examinations. 540 functions, high resolution 4-gradation display.',
-        SKU: 'CALC-CS-991CW',
-        price: 1595,
-        costPrice: 1250,
-        currentStock: 12,
-        minStockThreshold: 5,
-        leadTimeDays: 4,
-        safetyStock: 4,
-        images: ['https://images.unsplash.com/photo-1587145820266-a5951ee6f620?w=600&auto=format&fit=crop&q=80'],
-        tags: ['calculator', 'engineering', 'exam-essential'],
-        isFeatured: true,
       },
       {
         shopId: shop1._id,
@@ -242,121 +593,19 @@ const seedDatabase = async () => {
         SKU: 'GEO-DRF-01',
         price: 450,
         costPrice: 320,
-        currentStock: 14,
+        currentStock: 25,
         minStockThreshold: 8,
         leadTimeDays: 3,
         safetyStock: 6,
         images: ['https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=600&auto=format&fit=crop&q=80'],
-        tags: ['engineering', 'drawing'],
-        isFeatured: false,
-      },
-      {
-        shopId: shop1._id,
-        categoryId: catMap['files-folders'],
-        title: 'Solo A4 Ring Binder File Folder with 20 Clear Sleeves',
-        slug: 'solo-a4-ring-binder-with-sleeves',
-        description: 'Durable poly board file folder ideal for project report submissions and certificates.',
-        SKU: 'FL-SL-A4R',
-        price: 135,
-        costPrice: 90,
-        currentStock: 22,
-        minStockThreshold: 15,
-        leadTimeDays: 2,
-        safetyStock: 10,
-        images: ['https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=600&auto=format&fit=crop&q=80'],
-        tags: ['project-submission', 'files'],
-        isFeatured: false,
-      },
-      {
-        shopId: shop1._id,
-        categoryId: catMap['lab-supplies'],
-        title: 'A4 Millimeter Graph Sheets (Pack of 50 Sheets)',
-        slug: 'a4-millimeter-graph-sheets-pack-50',
-        description: 'Accurate 1mm grid spacing on heavy 80 GSM paper for mathematics and physics labs.',
-        SKU: 'LAB-GRP-50',
-        price: 60,
-        costPrice: 38,
-        currentStock: 40,
-        minStockThreshold: 20,
-        leadTimeDays: 2,
-        safetyStock: 15,
-        images: ['https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80'],
-        tags: ['graph-paper', 'exam-essential'],
-        isFeatured: false,
-      },
-      {
-        shopId: shop1._id,
-        categoryId: catMap['pens'],
-        title: 'Cello Butterflow Classic Blue Ball Pens (Pack of 5)',
-        slug: 'cello-butterflow-blue-pack-5',
-        description: 'Lubriflow ink system for ultra-smooth fast writing during university exam papers.',
-        SKU: 'PEN-CLO-BF5',
-        price: 50,
-        costPrice: 32,
-        currentStock: 65,
-        minStockThreshold: 25,
-        leadTimeDays: 2,
-        safetyStock: 20,
-        images: ['https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=600&auto=format&fit=crop&q=80'],
-        tags: ['pens', 'bestseller', 'exam-essential'],
-        isFeatured: true,
-      },
-      {
-        shopId: shop1._id,
-        categoryId: catMap['art-geometry'],
-        title: 'Camlin Exam Mathematical Drawing Instrument Box',
-        slug: 'camlin-exam-geometry-box',
-        description: 'Specially crafted compass, divider, and ruler set designed for university geometry and design labs.',
-        SKU: 'GEO-CAM-BX',
-        price: 120,
-        costPrice: 85,
-        currentStock: 24,
-        minStockThreshold: 10,
-        leadTimeDays: 3,
-        safetyStock: 8,
-        images: ['https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=600&auto=format&fit=crop&q=80'],
-        tags: ['geometry', 'engineering'],
-        isFeatured: false,
-      },
-      {
-        shopId: shop1._id,
-        categoryId: catMap['pens'],
-        title: 'Faber-Castell Textliner Highlighters (Pack of 4 Pastel Shades)',
-        slug: 'faber-castell-textliner-highlighter-4pk',
-        description: 'Water-based non-toxic pastel highlighters with 3 line widths for textbook study and revision.',
-        SKU: 'HLT-FC-4PK',
-        price: 110,
-        costPrice: 75,
-        currentStock: 28,
-        minStockThreshold: 12,
-        leadTimeDays: 2,
-        safetyStock: 10,
-        images: ['https://images.unsplash.com/photo-1585336261026-77cc7c358396?w=600&auto=format&fit=crop&q=80'],
-        tags: ['highlighter', 'exam-essential'],
-        isFeatured: false,
-      },
-      {
-        shopId: shop1._id,
-        categoryId: catMap['lab-supplies'],
-        title: 'Navneet Youva Practical Assignment Sheets (Pack of 100)',
-        slug: 'navneet-youva-practical-sheets-100',
-        description: 'Punch-hole ruled assignment sheets with margin for assignment submissions and lab files.',
-        SKU: 'NB-PRA-100',
-        price: 85,
-        costPrice: 55,
-        currentStock: 35,
-        minStockThreshold: 15,
-        leadTimeDays: 2,
-        safetyStock: 12,
-        images: ['https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=600&auto=format&fit=crop&q=80'],
-        tags: ['assignment', 'lab-supplies'],
+        tags: ['engineering', 'drawing', 'drafter'],
         isFeatured: false,
       },
     ];
 
     const createdProducts = await Product.create(productsData);
 
-    console.log('[Seed] Creating inventory ledger entries for initial stock...');
+    console.log('[Seed] Creating initial inventory ledger records for all products...');
     for (const prod of createdProducts) {
       await InventoryLedger.create({
         productId: prod._id,
@@ -367,24 +616,26 @@ const seedDatabase = async () => {
         balanceAfter: prod.currentStock,
         referenceType: 'INITIAL_STOCK',
         performedBy: vendor1._id,
-        notes: 'Initial catalog onboarding stock',
+        notes: 'Initial catalog stock for semester session',
       });
     }
 
-    console.log('[Seed] Creating academic calendar events for demand forecasting features...');
+    console.log('[Seed] Creating academic calendar events for examination demand...');
     const now = new Date();
     const midTermStart = new Date(now);
-    midTermStart.setDate(now.getDate() + 8); // In 8 days
+    midTermStart.setDate(now.getDate() + 10);
     const midTermEnd = new Date(midTermStart);
-    midTermEnd.setDate(midTermStart.getDate() + 6);
+    midTermEnd.setDate(midTermStart.getDate() + 7);
 
-    const projectDeadline = new Date(now);
-    projectDeadline.setDate(now.getDate() + 15);
+    const labPracticalStart = new Date(now);
+    labPracticalStart.setDate(now.getDate() + 25);
+    const labPracticalEnd = new Date(labPracticalStart);
+    labPracticalEnd.setDate(labPracticalStart.getDate() + 10);
 
     const endSemStart = new Date(now);
-    endSemStart.setDate(now.getDate() + 38);
+    endSemStart.setDate(now.getDate() + 45);
     const endSemEnd = new Date(endSemStart);
-    endSemEnd.setDate(endSemStart.getDate() + 14);
+    endSemEnd.setDate(endSemStart.getDate() + 15);
 
     await AcademicCalendar.create([
       {
@@ -392,162 +643,42 @@ const seedDatabase = async () => {
         eventType: 'MID_TERM_EXAMS',
         startDate: midTermStart,
         endDate: midTermEnd,
-        description: 'University mid-term theory tests across all engineering & science branches.',
+        description: 'University mid-term theory tests across all engineering branches.',
         impactCategory: 'EXAM_STATIONERY',
         isActive: true,
       },
       {
-        eventTitle: 'Final Year Major Project Interim Report Submission',
+        eventTitle: 'Semester End Laboratory & Practical Viva-Voce Sessions',
         eventType: 'PROJECT_SUBMISSION',
-        startDate: projectDeadline,
-        endDate: projectDeadline,
-        description: 'Hardcopy document submission with spiral or hardbound binding at department office.',
+        startDate: labPracticalStart,
+        endDate: labPracticalEnd,
+        description: 'Submission and verification of Semester 1 to 8 Laboratory Records & Manuals.',
         impactCategory: 'PROJECT_PRINTING',
         isActive: true,
       },
       {
-        eventTitle: 'End Semester University Examinations',
+        eventTitle: 'End Semester University Theory Examinations',
         eventType: 'END_SEM',
         startDate: endSemStart,
         endDate: endSemEnd,
-        description: 'Final semester examinations. Maximum demand surge for pens, calculators, and rough notebooks.',
+        description: 'Final university semester examinations.',
         impactCategory: 'EXAM_STATIONERY',
         isActive: true,
       },
     ]);
 
-    console.log('[Seed] Creating historical daily sales and completed orders for ML training...');
-    // Seed 45 days of past orders so ML model has actual historical time series
-    for (let dayOffset = 45; dayOffset >= 1; dayOffset--) {
-      const orderDate = new Date();
-      orderDate.setDate(orderDate.getDate() - dayOffset);
-      const isWeekend = orderDate.getDay() === 0 || orderDate.getDay() === 6;
-      const baseUnits = isWeekend ? 3 : 8;
-
-      const randomProd = createdProducts[dayOffset % createdProducts.length];
-      const qty = Math.max(1, Math.round(baseUnits + (Math.sin(dayOffset) * 2)));
-
-      const { otpHash } = generateDeliveryOtp();
-      const pastOrder = await Order.create({
-        orderNumber: `CC-HIST-${1000 + dayOffset}`,
-        studentId: student1._id,
-        shopId: shop1._id,
-        items: [
-          {
-            productId: randomProd._id,
-            productTitleSnapshot: randomProd.title,
-            skuSnapshot: randomProd.SKU,
-            quantity: qty,
-            unitPriceSnapshot: randomProd.price,
-            lineTotal: randomProd.price * qty,
-          },
-        ],
-        subtotal: randomProd.price * qty,
-        deliveryFee: 15,
-        totalAmount: randomProd.price * qty + 15,
-        paymentMethod: 'COD',
-        paymentStatus: 'PAID',
-        deliveryType: 'HOSTEL_DELIVERY',
-        deliveryAddressSnapshot: {
-          recipientName: 'Aarav Patel',
-          phone: '+91 98765 00004',
-          hostelBlock: 'Hostel Block C',
-          roomNumber: '312',
-          campusLandmark: 'Opposite Basketball Court',
-        },
-        deliveryAgentId: deliveryAgent._id,
-        deliveryOtpHash: otpHash,
-        status: 'COMPLETED',
-        createdAt: orderDate,
-        updatedAt: orderDate,
-        statusTimeline: [
-          { status: 'PLACED', timestamp: orderDate, note: 'Order placed by student' },
-          { status: 'COMPLETED', timestamp: orderDate, note: 'Handed over with OTP verification' },
-        ],
-      });
-    }
-
-    console.log('[Seed] Creating demo active orders and printing requests...');
-    const { otp: activeOtp, otpHash: activeOtpHash } = generateDeliveryOtp();
-    await Order.create({
-      orderNumber: 'CC-ACTIVE-2026',
-      studentId: student1._id,
-      shopId: shop1._id,
-      items: [
-        {
-          productId: createdProducts[0]._id,
-          productTitleSnapshot: createdProducts[0].title,
-          skuSnapshot: createdProducts[0].SKU,
-          quantity: 2,
-          unitPriceSnapshot: createdProducts[0].price,
-          lineTotal: createdProducts[0].price * 2,
-        },
-        {
-          productId: createdProducts[2]._id,
-          productTitleSnapshot: createdProducts[2].title,
-          skuSnapshot: createdProducts[2].SKU,
-          quantity: 1,
-          unitPriceSnapshot: createdProducts[2].price,
-          lineTotal: createdProducts[2].price * 1,
-        },
-      ],
-      subtotal: 440,
-      deliveryFee: 15,
-      totalAmount: 455,
-      paymentMethod: 'COD',
-      paymentStatus: 'PENDING',
-      deliveryType: 'HOSTEL_DELIVERY',
-      deliveryAddressSnapshot: {
-        recipientName: 'Aarav Patel',
-        phone: '+91 98765 00004',
-        hostelBlock: 'Hostel Block C',
-        roomNumber: '312',
-        campusLandmark: 'Opposite Basketball Court',
-      },
-      deliveryAgentId: deliveryAgent._id,
-      deliveryOtp: activeOtp,
-      deliveryOtpHash: activeOtpHash,
-      status: 'OUT_FOR_DELIVERY',
-      statusTimeline: [
-        { status: 'PLACED', timestamp: new Date(Date.now() - 3600000), note: 'Order placed' },
-        { status: 'ACCEPTED', timestamp: new Date(Date.now() - 2800000), note: 'Vendor confirmed stock' },
-        { status: 'PREPARING', timestamp: new Date(Date.now() - 2000000), note: 'Packed in bag' },
-        { status: 'READY_FOR_PICKUP', timestamp: new Date(Date.now() - 1500000), note: 'Handed to delivery team' },
-        { status: 'OUT_FOR_DELIVERY', timestamp: new Date(Date.now() - 600000), note: 'Agent on the way to Hostel Block C' },
-      ],
-    });
-
-    console.log(`[Seed Demo OTP Note]: Active test order #CC-ACTIVE-2026 delivery OTP is: ${activeOtp}`);
-
-    await PrintJob.create({
-      jobCode: 'PJ-2026-901',
-      studentId: student1._id,
-      shopId: shop1._id,
-      originalFileName: 'Machine_Learning_Assignment_3.pdf',
-      storedFileName: 'print_demo_sample.pdf',
-      filePath: 'uploads/print_jobs/print_demo_sample.pdf',
-      fileSize: 1048576,
-      pageCount: 16,
-      copies: 1,
-      printColor: 'BW',
-      paperSize: 'A4',
-      sides: 'DOUBLE',
-      bindingType: 'STAPLE',
-      additionalNotes: 'Please print duplex on bright white paper.',
-      estimatedPrice: 21.0,
-      finalPrice: 21.0,
-      status: 'READY_FOR_PICKUP',
-    });
-
     console.log('\n======================================================');
-    console.log(' CAMPUSCART AI — DATABASE SEEDING COMPLETED SUCCESSFULLY');
+    console.log(' CAMPUSCART AI — DATABASE SEEDING COMPLETED CLEANLY');
     console.log('======================================================');
-    console.log('Demo Credentials for All Roles:');
+    console.log('Total Products Created: ', createdProducts.length);
+    console.log('Lab Files for Semesters 1 to 8: All Loaded');
+    console.log('Old Fake Orders & Print Jobs: Completely Cleared!');
+    console.log('\nDemo User Accounts:');
     console.log('Student:        student@campuscart.edu       / Campus@123');
     console.log('Shop Owner:     vendor@campuscart.edu        / Campus@123');
+    console.log('Print Hub:      printvendor@campuscart.edu   / Campus@123');
     console.log('Delivery Agent: delivery@campuscart.edu      / Campus@123');
     console.log('Administrator:  admin@campuscart.edu         / Campus@123');
-    console.log('Active Order #CC-ACTIVE-2026 OTP:           ', activeOtp);
     console.log('======================================================\n');
 
     process.exit(0);
