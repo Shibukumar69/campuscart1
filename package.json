@@ -1,0 +1,28 @@
+{
+  "name": "campuscart-ai",
+  "version": "1.0.0",
+  "description": "Smart Student Stationery Delivery System Using Demand Prediction & Intelligent Inventory Management (MERN + ML)",
+  "scripts": {
+    "dev": "concurrently -n \"SERVER,CLIENT,ML\" -c \"blue,green,magenta\" \"npm run server\" \"npm run client\" \"npm run ml\"",
+    "server": "npm --prefix server run dev",
+    "client": "npm --prefix client run dev",
+    "ml": "powershell -Command \"if (Test-Path ml-service/venv/Scripts/python.exe) { ml-service/venv/Scripts/python.exe -m uvicorn app.main:app --app-dir ml-service --host 127.0.0.1 --port 8001 --reload } else { python -m uvicorn app.main:app --app-dir ml-service --host 127.0.0.1 --port 8001 --reload }\"",
+    "seed": "npm --prefix server run seed",
+    "test:server": "npm --prefix server test",
+    "test:ml": "powershell -Command \"if (Test-Path ml-service/venv/Scripts/pytest.exe) { ml-service/venv/Scripts/pytest.exe ml-service/tests } else { pytest ml-service/tests }\""
+  },
+  "keywords": [
+    "campuscart",
+    "mern",
+    "machine-learning",
+    "fastapi",
+    "stationery",
+    "inventory-management",
+    "demand-forecasting"
+  ],
+  "author": "CampusCart AI Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^10.0.6"
+  }
+}
