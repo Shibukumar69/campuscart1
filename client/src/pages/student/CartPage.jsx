@@ -59,10 +59,10 @@ export const CartPage = () => {
             {items.map(({ product, quantity }) => (
               <div
                 key={product._id}
-                className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between gap-4"
+                className="bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
               >
-                <div className="flex items-center space-x-3.5">
-                  <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden shrink-0">
+                <div className="flex items-center space-x-3.5 min-w-0">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-slate-100 dark:bg-slate-800 overflow-hidden shrink-0">
                     {product.images && product.images[0] ? (
                       <img src={product.images[0]} alt={product.title} className="w-full h-full object-cover" />
                     ) : (
@@ -71,18 +71,18 @@ export const CartPage = () => {
                       </div>
                     )}
                   </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">
+                  <div className="min-w-0">
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white line-clamp-1">
                       {product.title}
                     </h4>
-                    <p className="text-xs text-slate-400 font-mono mt-0.5">{product.SKU}</p>
-                    <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 mt-1">
+                    <p className="text-[10px] sm:text-xs text-slate-400 font-mono mt-0.5">{product.SKU}</p>
+                    <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 mt-0.5">
                       ₹{product.price} each
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center justify-between sm:justify-end space-x-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800/60">
                   {/* Quantity Controls */}
                   <div className="flex items-center border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800">
                     <button
@@ -91,7 +91,7 @@ export const CartPage = () => {
                     >
                       <Minus className="w-3.5 h-3.5" />
                     </button>
-                    <span className="px-3 text-xs font-bold text-slate-900 dark:text-white">{quantity}</span>
+                    <span className="px-2.5 sm:px-3 text-xs font-bold text-slate-900 dark:text-white">{quantity}</span>
                     <button
                       onClick={() => updateQuantity(product._id, quantity + 1)}
                       className="p-1.5 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-r-lg transition"

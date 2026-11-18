@@ -62,7 +62,7 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
 
 // Public Layout Wrapper with Navbar & Footer
 const PublicLayout = ({ children }) => (
-  <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors">
+  <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors pb-16 md:pb-0">
     <Navbar />
     <main className="flex-1">{children}</main>
     <Footer />

@@ -155,7 +155,7 @@ export const SmartPrintingPage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 px-4 sm:px-6 py-6 sm:py-8">
       <div className="pb-4 border-b border-slate-200 dark:border-slate-800">
         <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white flex items-center space-x-2">
           <Printer className="w-6 h-6 text-indigo-500" />

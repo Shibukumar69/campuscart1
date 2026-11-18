@@ -90,7 +90,7 @@ export const CheckoutPage = () => {
                 </span>
               </h3>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Student Name
@@ -100,7 +100,7 @@ export const CheckoutPage = () => {
                     value={address.recipientName}
                     onChange={(e) => setAddress({ ...address, recipientName: e.target.value })}
                     required
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                    className="w-full px-3 py-2.5 text-base sm:text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                   />
                 </div>
                 <div>
@@ -112,7 +112,7 @@ export const CheckoutPage = () => {
                     value={address.phone}
                     onChange={(e) => setAddress({ ...address, phone: e.target.value })}
                     required
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                    className="w-full px-3 py-2.5 text-base sm:text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                   />
                 </div>
               </div>
@@ -128,7 +128,7 @@ export const CheckoutPage = () => {
                       value={address.hostelBlock}
                       onChange={(e) => setAddress({ ...address, hostelBlock: e.target.value })}
                       required
-                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                      className="w-full px-3 py-2.5 text-base sm:text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                     />
                   </div>
                   <div>
@@ -140,7 +140,7 @@ export const CheckoutPage = () => {
                       value={address.roomNumber}
                       onChange={(e) => setAddress({ ...address, roomNumber: e.target.value })}
                       required
-                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                      className="w-full px-3 py-2.5 text-base sm:text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                     />
                   </div>
                 </div>
@@ -155,7 +155,7 @@ export const CheckoutPage = () => {
                   value={address.campusLandmark}
                   onChange={(e) => setAddress({ ...address, campusLandmark: e.target.value })}
                   placeholder="e.g. 2nd floor, next to drinking water cooler"
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  className="w-full px-3 py-2.5 text-base sm:text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                 />
               </div>
             </div>
@@ -167,7 +167,7 @@ export const CheckoutPage = () => {
                 <span>Payment Method</span>
               </h3>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label
                   className={`p-3.5 rounded-xl border cursor-pointer transition flex flex-col justify-between ${
                     paymentMethod === 'COD'

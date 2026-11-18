@@ -18,6 +18,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { useTheme } from '../../context/ThemeContext';
 import { Badge } from '../common/Badge';
+import { MobileBottomNav } from './MobileBottomNav';
 
 export const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -48,6 +49,7 @@ export const Navbar = () => {
   };
 
   return (
+    <>
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -252,5 +254,8 @@ export const Navbar = () => {
         </div>
       )}
     </header>
+    {/* Modern Native App Style Bottom Navigation for Mobile Devices */}
+    <MobileBottomNav />
+    </>
   );
 };
