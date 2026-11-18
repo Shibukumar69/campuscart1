@@ -53,7 +53,7 @@ app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get(['/', '/health', '/api/health'], (req, res) => {
   res.json({
     status: 'ok',
     service: 'CampusCart AI Express Backend',

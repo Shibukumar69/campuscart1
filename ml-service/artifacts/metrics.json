@@ -1,7 +1,7 @@
 {
   "model_name": "HistGradientBoostingRegressor",
   "model_version": "1.0.0",
-  "trained_at": "2026-11-18T18:38:44.182137",
+  "trained_at": "2026-11-19T00:07:41.938401",
   "validation_strategy": "Time-ordered walk-forward holdout (80/20)",
   "mae": 1.337,
   "rmse": 1.859,

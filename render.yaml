@@ -1,0 +1,44 @@
+services:
+  # 1. Express Backend Web Service
+  - type: web
+    name: campuscart-server
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        value: mongodb+srv://shibukumar3935_db_user:VrUeLsKcYyaAnyQy@cluster0.okq1bz2.mongodb.net/campuscart_ai?retryWrites=true&w=majority&appName=Cluster0
+      - key: JWT_ACCESS_SECRET
+        value: campuscart_super_secret_jwt_access_key_2026_prod
+      - key: JWT_REFRESH_SECRET
+        value: campuscart_super_secret_jwt_refresh_key_2026_prod
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "465"
+      - key: SMTP_USER
+        value: shibulucky6969@gmail.com
+      - key: SMTP_PASS
+        value: hlvs yfog ijex cztq
+      - key: EMAIL_FROM
+        value: '"CampusCart AI" <shibulucky6969@gmail.com>'
+      - key: ALLOWED_ORIGINS
+        value: "*"
+      - key: ML_SERVICE_URL
+        fromService:
+          type: web
+          name: campuscart-ml
+          property: host
+
+  # 2. Python FastAPI ML Service
+  - type: web
+    name: campuscart-ml
+    runtime: python
+    plan: free
+    rootDir: ml-service
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
