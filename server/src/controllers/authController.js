@@ -34,11 +34,11 @@ export const sendSignupOtp = async (req, res, next) => {
       success: true,
       message: emailResult?.delivered
         ? 'A 6-digit verification code has been sent to your Gmail.'
-        : 'Verification code generated! (Check your Gmail or use code in dev mode)',
+        : 'Verification code generated! (Email restricted in test mode - code provided)',
       data: {
         email: email.toLowerCase(),
         expiresInMinutes: 10,
-        devOtp: (!emailResult?.delivered || process.env.NODE_ENV === 'test') ? otp : undefined,
+        devOtp: !emailResult?.delivered ? otp : undefined,
       },
     });
   } catch (error) {
@@ -277,11 +277,11 @@ export const forgotPassword = async (req, res, next) => {
       success: true,
       message: emailResult?.delivered
         ? 'A 6-digit verification code has been sent to your Gmail.'
-        : 'Verification code generated! (Check your Gmail or use code in dev mode)',
+        : 'Verification code generated! (Email restricted in test mode - code provided)',
       data: {
         email: user.email,
         expiresInMinutes: 10,
-        devOtp: (!emailResult?.delivered || process.env.NODE_ENV === 'test') ? otp : undefined,
+        devOtp: !emailResult?.delivered ? otp : undefined,
       },
     });
   } catch (error) {
@@ -396,11 +396,11 @@ export const sendLoginOtp = async (req, res, next) => {
       success: true,
       message: emailResult?.delivered
         ? 'A 6-digit login code has been sent to your Gmail.'
-        : 'Login code generated! (Check your Gmail or use code in dev mode)',
+        : 'Login code generated! (Email restricted in test mode - code provided)',
       data: {
         email: user.email,
         expiresInMinutes: 10,
-        devOtp: (!emailResult?.delivered || process.env.NODE_ENV === 'test') ? otp : undefined,
+        devOtp: !emailResult?.delivered ? otp : undefined,
       },
     });
   } catch (error) {
