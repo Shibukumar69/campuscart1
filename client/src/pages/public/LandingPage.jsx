@@ -22,24 +22,24 @@ export const LandingPage = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28">
+      <section className="relative overflow-hidden pt-6 sm:pt-12 pb-16 lg:pt-20 lg:pb-28">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-100 via-transparent to-transparent dark:from-indigo-950/40 pointer-events-none" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold text-indigo-700 dark:text-indigo-300 mb-6">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
-              <span>Smart Campus Logistics & Machine Learning Demand Forecasting</span>
+            <div className="inline-flex items-center space-x-1.5 sm:space-x-2 px-3 py-1 sm:py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-[11px] sm:text-xs font-semibold text-indigo-700 dark:text-indigo-300 mb-4 sm:mb-6">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+              <span>Smart Campus Logistics & AI Demand Forecasting</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+            <h1 className="text-2xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
               Campus Stationery & Xerox, Delivered in{' '}
               <span className="bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent">
                 Minutes.
               </span>
             </h1>
 
-            <p className="mt-6 text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto">
+            <p className="mt-3 sm:mt-6 text-xs sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto">
               Order notebooks, engineering records, scientific calculators, and submit PDF documents for instant campus printing.
               Powered by AI models that forecast student demand before exam rushes.
             </p>
