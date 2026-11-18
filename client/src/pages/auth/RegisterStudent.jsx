@@ -57,7 +57,11 @@ export const RegisterStudent = () => {
       });
 
       if (res.data.success) {
-        toast.success('Verification code sent to your Gmail inbox!');
+        toast.success(res.data.message || 'Verification code sent to your Gmail inbox!');
+        if (res.data.data?.devOtp) {
+          setOtp(res.data.data.devOtp);
+          toast.info(`Your verification code is: ${res.data.data.devOtp}`, { duration: 15000 });
+        }
         setCountdown(60);
         setStep(2);
       }

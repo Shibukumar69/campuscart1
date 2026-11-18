@@ -41,6 +41,10 @@ export const ForgotPassword = () => {
       const res = await api.post('/auth/forgot-password', { email });
       if (res.data.success) {
         toast.success(res.data.message || 'Verification code sent to your Gmail!');
+        if (res.data.data?.devOtp) {
+          setOtp(res.data.data.devOtp);
+          toast.info(`Your verification code is: ${res.data.data.devOtp}`, { duration: 15000 });
+        }
         setCountdown(60);
         setStep(2);
       }

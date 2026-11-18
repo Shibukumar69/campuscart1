@@ -11,7 +11,20 @@ const getTransporter = () => {
       user,
       pass,
     },
+    // Strict connection & socket timeouts to prevent cloud servers (e.g. Render) from hanging
+    connectionTimeout: 3500,
+    greetingTimeout: 3500,
+    socketTimeout: 4500,
   });
+};
+
+const sendMailWithTimeout = async (transporter, mailOptions, timeoutMs = 4500) => {
+  return Promise.race([
+    transporter.sendMail(mailOptions),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`SMTP send timed out after ${timeoutMs}ms`)), timeoutMs)
+    ),
+  ]);
 };
 
 /**
@@ -105,7 +118,7 @@ export const sendOrderOtpEmail = async ({ toEmail, studentName, orderNumber, otp
   `;
 
   try {
-    const info = await transporter.sendMail({
+    const info = await sendMailWithTimeout(transporter, {
       from: fromEmail,
       to: toEmail,
       subject: `CampusCart AI — Order #${orderNumber} Confirmed (Delivery OTP: ${otp})`,
@@ -177,7 +190,7 @@ export const sendPasswordResetOtpEmail = async ({ toEmail, userName, otp }) => {
   `;
 
   try {
-    const info = await transporter.sendMail({
+    const info = await sendMailWithTimeout(transporter, {
       from: fromEmail,
       to: toEmail,
       subject: `CampusCart AI — Password Reset Verification Code (${otp})`,
@@ -250,7 +263,7 @@ export const sendLoginOtpEmail = async ({ toEmail, userName, otp }) => {
   `;
 
   try {
-    const info = await transporter.sendMail({
+    const info = await sendMailWithTimeout(transporter, {
       from: fromEmail,
       to: toEmail,
       subject: `CampusCart AI — Your Sign-In Code (${otp})`,
@@ -323,7 +336,7 @@ export const sendSignupOtpEmail = async ({ toEmail, userName, otp }) => {
   `;
 
   try {
-    const info = await transporter.sendMail({
+    const info = await sendMailWithTimeout(transporter, {
       from: fromEmail,
       to: toEmail,
       subject: `CampusCart AI — Verify Your Student Email (${otp})`,

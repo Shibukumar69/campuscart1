@@ -28,15 +28,17 @@ export const sendSignupOtp = async (req, res, next) => {
       expiresAt,
     });
 
-    await sendSignupOtpEmail({ toEmail: email.toLowerCase(), userName: name || 'Student', otp });
+    const emailResult = await sendSignupOtpEmail({ toEmail: email.toLowerCase(), userName: name || 'Student', otp });
 
     res.json({
       success: true,
-      message: 'A 6-digit verification code has been sent to your Gmail.',
+      message: emailResult?.deliveredViaSmtp
+        ? 'A 6-digit verification code has been sent to your Gmail.'
+        : 'Verification code generated! (Use the code shown on screen)',
       data: {
         email: email.toLowerCase(),
         expiresInMinutes: 10,
-        devOtp: process.env.NODE_ENV === 'test' ? otp : undefined,
+        devOtp: (!emailResult?.deliveredViaSmtp || process.env.NODE_ENV !== 'production') ? otp : undefined,
       },
     });
   } catch (error) {
@@ -269,15 +271,17 @@ export const forgotPassword = async (req, res, next) => {
     user.resetPasswordOtpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
     await user.save();
 
-    await sendPasswordResetOtpEmail({ toEmail: user.email, userName: user.name, otp });
+    const emailResult = await sendPasswordResetOtpEmail({ toEmail: user.email, userName: user.name, otp });
 
     res.json({
       success: true,
-      message: 'A 6-digit verification code has been sent to your Gmail.',
+      message: emailResult?.deliveredViaSmtp
+        ? 'A 6-digit verification code has been sent to your Gmail.'
+        : 'Verification code generated! (Use the code shown on screen)',
       data: {
         email: user.email,
         expiresInMinutes: 10,
-        devOtp: process.env.NODE_ENV === 'test' ? otp : undefined,
+        devOtp: (!emailResult?.deliveredViaSmtp || process.env.NODE_ENV !== 'production') ? otp : undefined,
       },
     });
   } catch (error) {
@@ -386,15 +390,17 @@ export const sendLoginOtp = async (req, res, next) => {
     user.loginOtpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
     await user.save();
 
-    await sendLoginOtpEmail({ toEmail: user.email, userName: user.name, otp });
+    const emailResult = await sendLoginOtpEmail({ toEmail: user.email, userName: user.name, otp });
 
     res.json({
       success: true,
-      message: 'A 6-digit login code has been sent to your Gmail.',
+      message: emailResult?.deliveredViaSmtp
+        ? 'A 6-digit login code has been sent to your Gmail.'
+        : 'Login code generated! (Use the code shown on screen)',
       data: {
         email: user.email,
         expiresInMinutes: 10,
-        devOtp: process.env.NODE_ENV === 'test' ? otp : undefined,
+        devOtp: (!emailResult?.deliveredViaSmtp || process.env.NODE_ENV !== 'production') ? otp : undefined,
       },
     });
   } catch (error) {
