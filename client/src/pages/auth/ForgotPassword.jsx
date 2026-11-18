@@ -42,11 +42,6 @@ export const ForgotPassword = () => {
       const res = await api.post('/auth/forgot-password', { email });
       if (res.data.success) {
         toast.success(res.data.message || 'Verification code sent to your Gmail!');
-        if (res.data.data?.devOtp) {
-          setOtp(res.data.data.devOtp);
-          setDevOtpCode(res.data.data.devOtp);
-          toast.info(`Your verification code is: ${res.data.data.devOtp}`, { duration: 15000 });
-        }
         setCountdown(60);
         setStep(2);
       }
@@ -166,22 +161,6 @@ export const ForgotPassword = () => {
           {/* STEP 2: VERIFY OTP & ENTER NEW PASSWORD */}
           {step === 2 && (
             <form onSubmit={handleResetPassword} className="space-y-4">
-              {devOtpCode && (
-                <div className="p-3 bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 rounded-xl flex items-center justify-between text-xs text-indigo-900 dark:text-indigo-200 shadow-sm animate-in fade-in">
-                  <div className="flex items-center space-x-2">
-                    <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                    <span>Your Verification Code: <strong className="font-mono text-sm tracking-widest text-indigo-700 dark:text-indigo-300 ml-1">{devOtpCode}</strong></span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setOtp(devOtpCode)}
-                    className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition"
-                  >
-                    Auto-Fill
-                  </button>
-                </div>
-              )}
-
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">

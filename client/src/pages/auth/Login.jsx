@@ -73,10 +73,6 @@ export const Login = () => {
       const res = await api.post('/auth/send-login-otp', { email });
       if (res.data.success) {
         toast.success(res.data.message || 'Login code sent to your Gmail inbox!');
-        if (res.data.data?.devOtp) {
-          setOtp(res.data.data.devOtp);
-          toast.info(`Your login code is: ${res.data.data.devOtp}`, { duration: 15000 });
-        }
         setOtpSent(true);
         setCountdown(60);
       }
