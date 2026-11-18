@@ -51,16 +51,16 @@ export const Navbar = () => {
   return (
     <>
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
-          <div className="flex items-center shrink-0">
-            <Link to="/" className="flex items-center space-x-2 group shrink-0">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform shrink-0">
+          <div className="flex items-center min-w-0 shrink">
+            <Link to="/" className="flex items-center space-x-1.5 sm:space-x-2 group">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform shrink-0">
                 <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div className="flex flex-col">
-                <span className="font-black text-base sm:text-lg tracking-tight bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent whitespace-nowrap">
+              <div className="flex flex-col min-w-0">
+                <span className="font-black text-sm sm:text-lg tracking-tight bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent whitespace-nowrap">
                   CampusCart AI
                 </span>
                 <span className="hidden sm:block text-[10px] text-slate-500 dark:text-slate-400 font-medium -mt-1 tracking-wider uppercase whitespace-nowrap">
@@ -100,7 +100,7 @@ export const Navbar = () => {
           </nav>
 
           {/* Right Action Controls */}
-          <div className="flex items-center space-x-1 sm:space-x-2.5 shrink-0">
+          <div className="flex items-center space-x-1 sm:space-x-2 shrink-0">
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
@@ -184,26 +184,38 @@ export const Navbar = () => {
                 )}
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
+              <>
+                {/* Desktop Auth Buttons */}
+                <div className="hidden sm:flex items-center space-x-2">
+                  <Link
+                    to="/login"
+                    className="px-3.5 py-1.5 text-xs font-semibold rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                  >
+                    Log In
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="px-3.5 py-1.5 text-xs font-semibold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-500/20 transition"
+                  >
+                    Join Free
+                  </Link>
+                </div>
+
+                {/* Mobile Single Sign In Button */}
                 <Link
                   to="/login"
-                  className="px-3.5 py-1.5 text-xs font-semibold rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                  className="sm:hidden px-2.5 py-1 text-[11px] font-bold rounded-lg text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 transition shrink-0"
                 >
                   Log In
                 </Link>
-                <Link
-                  to="/register"
-                  className="px-3.5 py-1.5 text-xs font-semibold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-500/20 transition"
-                >
-                  Join Free
-                </Link>
-              </div>
+              </>
             )}
 
             {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+              className="md:hidden p-1.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg shrink-0"
+              aria-label="Toggle Navigation Menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -213,7 +225,7 @@ export const Navbar = () => {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-200 dark:border-slate-800 px-4 pt-2 pb-4 space-y-2 bg-white dark:bg-slate-900">
+        <div className="md:hidden border-t border-slate-200 dark:border-slate-800 px-4 pt-2 pb-4 space-y-2 bg-white dark:bg-slate-900 shadow-xl animate-in slide-in-from-top-1">
           <Link
             to="/marketplace"
             onClick={() => setMobileMenuOpen(false)}
@@ -242,14 +254,31 @@ export const Navbar = () => {
           >
             About CampusCart AI
           </Link>
-          {isAuthenticated && (
+          {isAuthenticated ? (
             <Link
               to={getDashboardLink()}
               onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400"
+              className="block py-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400"
             >
               Go to Dashboard ({user?.role})
             </Link>
+          ) : (
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex space-x-2">
+              <Link
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 text-center py-2 text-xs font-bold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white"
+              >
+                Log In
+              </Link>
+              <Link
+                to="/register"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 text-center py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white shadow-xs"
+              >
+                Join Free
+              </Link>
+            </div>
           )}
         </div>
       )}
