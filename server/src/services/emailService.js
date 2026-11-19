@@ -65,20 +65,63 @@ export const sendViaResendHttp = async ({ toEmail, subject, html }) => {
 };
 
 /**
+ * Send email via Google Apps Script Webhook (Port 443 HTTPS)
+ * Directly connects to Gmail - sends to ANY student email address in the world with ZERO domain restrictions!
+ */
+export const sendViaGoogleScriptWebhook = async ({ toEmail, subject, html }) => {
+  const webhookUrl =
+    (process.env.GOOGLE_SCRIPT_WEBHOOK_URL ||
+      'https://script.google.com/macros/s/AKfycbx-_5VYiShqzawcd4xsSo6K09l_TY0vV2Kr8nBZm2hCpJ02dEnbe8R03PrmdrmUrCCD/exec').trim();
+
+  try {
+    const res = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8',
+      },
+      body: JSON.stringify({
+        to: toEmail,
+        subject,
+        html,
+      }),
+      redirect: 'follow',
+    });
+
+    const data = await res.json().catch(() => null);
+    if (res.ok && data?.success) {
+      console.log(`[Google Webhook Success] Real Gmail delivered to ${toEmail}`);
+      return { success: true, delivered: true, method: 'google_script' };
+    }
+    console.warn(`[Google Webhook Notice] Webhook response for ${toEmail}:`, data);
+    return { success: false, delivered: false, error: data?.error };
+  } catch (err) {
+    console.warn(`[Google Webhook Fetch Error]`, err.message);
+    return { success: false, delivered: false, error: err.message };
+  }
+};
+
+/**
  * Universal email dispatcher:
- * 1. Primary: Resend HTTPS API (Port 443 - works on Render without SMTP blocks)
- * 2. Secondary: Nodemailer Gmail SMTP with 3.5s timeout
+ * 1. Primary: Google Apps Script Webhook (Port 443 HTTPS - sends real Gmail to ANY email in the world!)
+ * 2. Secondary: Resend HTTPS API (Port 443)
+ * 3. Tertiary: Nodemailer Gmail SMTP with 3.5s timeout
  */
 export const dispatchEmail = async ({ toEmail, subject, html, otp }) => {
   if (!toEmail) return { success: false };
 
-  // 1. Try Resend via HTTPS (Port 443)
+  // 1. Primary: Google Apps Script Webhook (Sends to ANY email in the world!)
+  const googleResult = await sendViaGoogleScriptWebhook({ toEmail, subject, html });
+  if (googleResult.success) {
+    return { success: true, delivered: true, deliveredViaGoogle: true };
+  }
+
+  // 2. Secondary: Try Resend via HTTPS (Port 443)
   const resendResult = await sendViaResendHttp({ toEmail, subject, html });
   if (resendResult.success) {
     return { success: true, delivered: true, deliveredViaHttp: true, id: resendResult.id };
   }
 
-  // 2. Fallback to Gmail SMTP (with 3.5s timeout)
+  // 3. Fallback: Gmail SMTP (with 3.5s timeout)
   try {
     const transporter = getTransporter();
     const fromEmail = process.env.EMAIL_FROM || '"CampusCart AI" <shibulucky6969@gmail.com>';
